@@ -1,18 +1,12 @@
-name: Terraform (Apply / Destroy)
+name: Terraform Apply / Destroy
 
 on:
-  # Automatic run when code is pushed
-  push:
-    branches:
-      - main
-
-  # Manual trigger with options (Apply or Destroy)
   workflow_dispatch:
     inputs:
       action:
         description: "Choose Terraform action"
         required: true
-        default: "apply"
+        default: apply
         type: choice
         options:
           - apply
@@ -23,15 +17,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Get the code
+      # Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Install Terraform
+      # Install Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # Step 3: Terraform Init
+      # Initialize Terraform with S3 backend
       - name: Terraform Init
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -39,7 +33,7 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: terraform init
 
-      # Step 4: Terraform Apply (only if action = apply)
+      # Apply (Create EC2)
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
         env:
@@ -48,7 +42,7 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: terraform apply -auto-approve
 
-      # Step 5: Terraform Destroy (only if action = destroy)
+      # Destroy (Delete EC2)
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
         env:
