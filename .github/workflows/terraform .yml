@@ -1,0 +1,39 @@
+# Name of the GitHub Actions workflow (shown in GitHub UI)
+name: Terraform Deploy using GitHub Actions
+
+# This workflow runs when code is pushed to main branch
+on:
+  push:
+    branches:
+      - main
+
+# Jobs are tasks GitHub Actions will execute
+jobs:
+  terraform:
+
+    # GitHub provides a Linux virtual machine to run this job
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download (checkout) repository code into the runner
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install Terraform on the GitHub runner
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # Step 3: Initialize Terraform
+      # Downloads AWS provider and prepares Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # Step 4: Apply Terraform configuration
+      # -auto-approve avoids manual approval
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+        # AWS credentials are passed securely from GitHub Secrets
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
