@@ -15,9 +15,9 @@ resource "aws_instance" "web_server" {
               systemctl start docker
               systemctl enable docker
 
-              docker pull YOUR_DOCKERHUB_USERNAME/django-backend:v1
+              docker pull muhammadsafad/django-backend:v1
               docker run -d -p 8000:8000 --restart=always \
-                YOUR_DOCKERHUB_USERNAME/django-backend:v1
+                muhammadsafad/django-backend:v1
               EOF
 
   tags = {
